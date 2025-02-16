@@ -3,7 +3,6 @@ import { Metadata } from "next";
 import CabinList from "../_components/CabinList";
 import { Suspense } from "react";
 import Spinner from "../_components/Spinner";
-import { SearchParams } from "next/dist/server/request/search-params";
 import Filter from "../_components/Filter";
 import ReservationReminder from "../_components/ReservationReminder";
 export const metadata: Metadata = {
@@ -19,14 +18,14 @@ export interface Cabin {
   description?: string;
   image: string;
 }
-
-export default async function Page({
-    searchParams
-}:{searchParams: SearchParams}) {
-    const {capacity} = await searchParams;
-    const filter = capacity ?? 'all'
-    console.log(typeof filter);
-    
+interface Props {
+  searchParams: Promise<{
+    capacity: string;
+  }>;
+}
+export default async function Page({ searchParams }: Props) {
+  const { capacity } = await searchParams;
+  const filter = capacity ?? "all";
 
   return (
     <div>
@@ -44,12 +43,10 @@ export default async function Page({
       <div className="flex justify-end mb-8">
         <Filter />
       </div>
-        <Suspense fallback={<Spinner />}
-        key={filter as string}
-        >
-            <CabinList filter={filter}/>
-            <ReservationReminder />
-        </Suspense>
+      <Suspense fallback={<Spinner />} key={filter as string}>
+        <CabinList filter={filter} />
+        <ReservationReminder />
+      </Suspense>
     </div>
   );
 }
